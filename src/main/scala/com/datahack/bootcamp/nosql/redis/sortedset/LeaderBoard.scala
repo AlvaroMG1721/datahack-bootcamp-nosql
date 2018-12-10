@@ -1,26 +1,53 @@
 package com.datahack.bootcamp.nosql.redis.sortedset
 
+import akka.util.ByteString
 import redis.RedisClient
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+/**
+  * Esta clase va ha gestionar un tablon para un juego concreto.
+  * Cada tablon es un sortedset para ese juego
+  *
+  * @param gameName Nombre del juego para el que se crea el tablón
+  * @param redis Cliente de redis para acceder a la base de datos
+  */
+
 class LeaderBoard(gameName: String, redis: RedisClient) {
 
+  // clave del tablón
   val key = s"game:$gameName"
 
+  // Añade un usuario a un leader board junto a su puntuación obtenida
+  // TODO: utiliza el método zadd para añadir un usuario junto a su putuación en un sortedset
+  // http://etaty.github.io/rediscala/latest/api/redis/api/sortedsets/Zadd.html
   def addUser(userName: String, score: Double): Future[Unit] = {
-    redis.zadd(key, (score, userName)).map(_ => println(s"User $userName, added to the leaderboard!"))
+    val userAdded: Future[Long] = ???
+    userAdded.map(_ => println(s"User $userName, added to the leaderboard!"))
   }
 
-  def removeUser(userName: String): Unit = {
-    redis.zrem(key, userName).map(_ => println(s"User $userName, removed successfully!"))
+  // Elimina un usuario de un leader board
+  // TODO: utiliza el método zrem para eliminar a un suario de un sortedset
+  // http://etaty.github.io/rediscala/latest/api/redis/api/sortedsets/Zrem.html
+  def removeUser(userName: String): Future[Unit] = {
+    val userDeleted: Future[Long] = ???
+    userDeleted.map(_ => println(s"User $userName, removed successfully!"))
   }
 
+  // Imprime la puntuación y la posición de un usuario en el ranking del juego
   def getUserScoreAndRank(userName: String): Future[Unit] = {
+    // TODO: utiliza el método zsocre para obtener la puntuación se un usuario
+    // http://etaty.github.io/rediscala/latest/api/redis/api/sortedsets/Zscore.html
+    def theScore: Future[Option[Double]] = redis.zscore(key, userName)
+
+    // TODO: utiliza el método zrevrank para obtener la posición en el ranking del usuario
+    // http://etaty.github.io/rediscala/latest/api/redis/api/sortedsets/Zrevrank.html
+    def theRank: Future[Option[Long]] = redis.zrevrank(key, userName)
+
     for {
-      score <- redis.zscore(key, userName)
-      rank <- redis.zrevrank(key, userName)
+      score <- theScore
+      rank <- theRank
     } yield {
       println(s"Details of $userName:")
       score.foreach(userScore => println(s" -- Score: $userScore"))
@@ -28,14 +55,18 @@ class LeaderBoard(gameName: String, redis: RedisClient) {
     }
   }
 
+  // imprime el top de x usuarios (limit) de un juego
+  // TODO: utiliza el comando zrevrangeWithscores para obtener los x primeros usuarios de un sorted set
   def showTopUsers(limit: Int): Future[Unit] = {
-    redis.zrevrangeWithscores(key, 0, limit - 1).map { users =>
+    val topUsers: Future[Seq[(ByteString, Double)]] = ???
+    topUsers.map { users =>
       println(s"Top $limit users:")
       users.zipWithIndex
         .foreach(user => println(s" -- #rank: ${user._2 + 1} user: ${user._1._1.utf8String} score: ${user._1._2}"))
     }
   }
 
+  // Devuelve los x usuarios (quantity) alrededor de un usuario concreto, junto a su puntuación y su ranking.
   def getUsersAroundUser(userName: String, quantity: Int): Future[Seq[User]] = {
 
     def startOffset(rank: Long): Long = Math.floor(rank - (quantity / 2) + 1).toLong
@@ -57,4 +88,5 @@ class LeaderBoard(gameName: String, redis: RedisClient) {
   }
 }
 
+// Almacena los datos de un usuario.
 case class User(rank: Long, score: Double, userName: String)

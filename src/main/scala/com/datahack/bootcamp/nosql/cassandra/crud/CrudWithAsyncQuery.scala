@@ -16,28 +16,7 @@ class CrudWithAsyncQuery(session: Session) {
   val COUNTRY_COLUMN: String = "country"
   val CITY_COLUMN: String = "city"
 
-  def executeQuery(statement: Statement): Future[ResultSet] = {
-
-    val resultSet: Promise[ResultSet] = Promise[ResultSet]()
-
-    val futureRs: ResultSetFuture = session.executeAsync(statement)
-
-    var resultSetGotten = true
-
-    while(resultSetGotten) {
-      if(futureRs.isCancelled) {
-        resultSetGotten = false
-        resultSet failure new Exception("Result Set cancelled")
-      }
-      else if(futureRs.isDone) {
-        resultSetGotten = false
-        resultSet success futureRs.get()
-      }
-      else Thread.sleep(500L)
-    }
-
-    resultSet.future
-  }
+  def executeQuery(statement: Statement): Future[ResultSet] = ???
 
   def insertIntoUsers(keySpaceName: String, user: User): Future[Boolean] = {
     val query = QueryBuilder

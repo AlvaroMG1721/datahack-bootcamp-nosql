@@ -1,10 +1,19 @@
 package com.datahack.bootcamp.nosql.redis.bitmap
 
 import akka.actor.ActorSystem
+import akka.util.ByteString
 import redis.RedisClient
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
+/**
+  * Con este ejercicio se pretende aprender los comandos mas comunes para los bitmaps
+  * Vamos a implementar un sistema para contabilizar las visitas de una web
+  * Para cada día vamos a utilizar una entrada nuava (una nueva clave)
+  * El valor asociado a esa clave es un bitmap, de tal forma que cada usuairo representa una posición del bitmap
+  * y su valor 0 o 1 indica si se ha visitado (1) o no (0)
+  **/
 
 object WebAnalytics extends App {
 
@@ -12,18 +21,25 @@ object WebAnalytics extends App {
 
   val redis: RedisClient = RedisClient(host = "127.0.0.1", port = 6379)
 
+  // Genera la clave para cada día
   def visitsKey(date: String) = s"visits:daily:$date"
 
-  def storeDailyVisit(date: String, userId: Int): Future[Boolean] = {
-    redis.setbit(visitsKey(date), userId, true)
-  }
+  // Almacena una visita para un usuario en un día concreto
+  // TODO: utiliza el método setbit para poner a 1 la posición del userId en el bitmap
+  // http://etaty.github.io/rediscala/latest/api/redis/api/strings/Setbit.html
+  def storeDailyVisit(date: String, userId: Int): Future[Boolean] = ???
 
-  def countVisits(date: String): Future[Long] = {
-    redis.bitcount(visitsKey(date))
-  }
+  // Cuenta todas las visitas para un día concreto
+  // TODO: utilza el método bitcount para obtener el número de bits del bitmap
+  // http://etaty.github.io/rediscala/latest/api/redis/api/strings/Bitcount.html
+  def countVisits(date: String): Future[Long] = ???
 
+  // obriene los ids de los usuarios que han visitado la página en un día concreto
+  // TODO: utiliza el método get para obtener el bitmap asociado a una fecha
+  // http://etaty.github.io/rediscala/latest/api/redis/api/strings/Get.html
   def showUserIdsFromVisit(date: String): Future[Seq[Option[Int]]] = {
-    redis.get(visitsKey(date)).map { someDateBiteMap =>
+    val vistis: Future[Option[ByteString]] = ???
+    vistis.map { someDateBiteMap =>
       someDateBiteMap.map { dateBitMap =>
         dateBitMap.zipWithIndex.map { byteWithIndex =>
           val byte = byteWithIndex._1

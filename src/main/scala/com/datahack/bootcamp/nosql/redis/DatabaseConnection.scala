@@ -9,22 +9,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object DatabaseConnection extends App {
 
-  implicit val akkaSystem: ActorSystem = akka.actor.ActorSystem()
+  implicit val akkaSystem: ActorSystem = ???
 
-  val redis = RedisClient(host = "127.0.0.1", port = 6379)
+  val redis = ???
 
-  val futurePong = redis.ping()
-  println("Ping sent!")
-  futurePong.map(pong => {
-    println(s"Redis replied with a $pong")
-  })
-  Await.result(futurePong, 5 seconds)
+  val futurePong = ???
 
-  val futureResult = doSomething(redis)
-
-  Await.result(futureResult, 5 seconds)
-
-  akkaSystem.shutdown()
+  val futureResult = ???
 
   def doSomething(redis: RedisClient): Future[Boolean] = {
     // launch command set and del in parallel
@@ -45,7 +36,6 @@ object DatabaseConnection extends App {
       val ibefore = iBefore.map(_.utf8String)
       val iafter = iAfter.map(_.utf8String)
       println(s"i was $ibefore, now is $iafter")
-      iafter == "20"
     }
   }
 

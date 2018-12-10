@@ -6,14 +6,9 @@ import scala.util.Try
 
 object DatabaseConnection extends App {
 
-  lazy val cluster: Try[Cluster] = Try {
-    Cluster.builder()
-      .addContactPoint("127.0.0.1")
-      .withCredentials("cassandra", "cassandra")
-      .build()
-  }
+  lazy val cluster: Try[Cluster] = ???
 
-  def connect(): Try[Session] = cluster.map(_.connect())
+  def connect(): Try[Session] = ???
 
   def performExample: Try[Unit] = {
     connect().map { session =>

@@ -7,80 +7,24 @@ import scala.util.Try
 
 class Crud(session: Session) {
 
-  def createKeySpace(keySpaceName: String, replicationStrategy: String, replicationFactor: Int): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |CREATE KEYSPACE $keySpaceName
-         |WITH replication = {'class':'$replicationStrategy', 'replication_factor':$replicationFactor}
-         |""".stripMargin)
-    ).map(_.isExhausted)
-  }
+  def createKeySpace(keySpaceName: String, replicationStrategy: String, replicationFactor: Int): Try[Boolean] = ???
 
-  def dropKeySpace(keySpaceName: String): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |DROP KEYSPACE IF EXISTS $keySpaceName
-       """.stripMargin)
-    ).map(_.isExhausted)
-  }
+  def dropKeySpace(keySpaceName: String): Try[Boolean] = ???
 
-  def createTableUsers(keySpaceName: String): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |CREATE TABLE $keySpaceName.users (
-         |    name text,
-         |    email text,
-         |    city text,
-         |    country text,
-         |    PRIMARY KEY (name, country, city)
-         |)
-       """.stripMargin)
-    ).map(_.isExhausted)
-  }
+  def createTableUsers(keySpaceName: String): Try[Boolean] = ???
 
-  def insertIntoUsers(keySpaceName: String, user: User): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |INSERT INTO $keySpaceName.users (name, email, city, country)
-         |VALUES ('${user.name}', '${user.email}', '${user.city}', '${user.country}')
-      """.stripMargin)
-    ).map(_.isExhausted)
-  }
+  def insertIntoUsers(keySpaceName: String, user: User): Try[Boolean] = ???
 
   def getAllUsers(keySpaceName: String): Seq[User] = {
     import scala.collection.JavaConverters._
-    val result = session.execute(
-      s"""
-         |SELECT * FROM $keySpaceName.users
-       """.stripMargin)
+    val result: ResultSet = ???
     result.asScala.map(User.fromRow).toSeq
   }
 
-  def getUserByName(keySpaceName: String, userName: String): Option[User] = {
-    import scala.collection.JavaConverters._
-    val result = session.execute(
-      s"""
-         |SELECT * FROM $keySpaceName.users WHERE name = '$userName'
-       """.stripMargin)
-    result.iterator().asScala.toSeq.headOption.map(User.fromRow)
-  }
+  def getUserByName(keySpaceName: String, userName: String): Option[User] = ???
 
-  def deleteUser(keySpaceName: String, userName: String): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |DELETE FROM $keySpaceName.users WHERE name = '$userName'
-       """.stripMargin)
-    ).map(_.isExhausted)
-  }
+  def deleteUser(keySpaceName: String, userName: String): Try[Boolean] = ???
 
-  def updateUser(keySpaceName: String, user: User): Try[Boolean] = {
-    Try(session.execute(
-      s"""
-         |UPDATE $keySpaceName.users
-         |SET email = '${user.email}'
-         |WHERE name = '${user.name}' AND country = '${user.country}' AND city = '${user.city}'
-       """.stripMargin)
-    ).map(_.isExhausted)
-  }
+  def updateUser(keySpaceName: String, user: User): Try[Boolean] = ???
 
 }
